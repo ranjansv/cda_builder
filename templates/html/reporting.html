@@ -1,0 +1,38 @@
+<!DOCTYPE html> 
+
+ 
+<html lang="en"> 
+{% include "header.html" %}
+
+<body>
+
+{% include "navigation.html" %}
+
+<section class ="document_container">
+<!div class="demo">
+<h1 style = "background-color: rgba(250,250,100,0.6);"/>
+Tick fields for - CSV Report Generation</h1>
+<br>
+<form action="/generate_csv.html/" method="POST"
+>
+<table>
+{% for attribute in list_attribute %}
+<tr style="font-size:15px; padding:20px; height:40px;
+vertical-align:bottom;">
+<td><input type="checkbox" name="name_of_attribute" value="{{attribute}}" /> </td>
+<td>{{attribute}}</td>
+</tr>
+{% endfor %}
+</table>
+<br>
+Enter Day: <input type="text" name="day" value="{{day}}" maxlength ="5" size ="5"/>
+<br><br>
+<input type="submit" value="Generate CSV" />
+</form>
+<!/div>
+
+</section>
+{% include "footer.html" %}
+</body> 
+</html>
+
