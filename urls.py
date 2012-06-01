@@ -25,6 +25,16 @@ urlpatterns = patterns('',
     ('^cda_builder/patient_manager.html$',views.patient_manager),
     ('^cda_builder/admin_settings.html$',views.admin_settings),
     ('^cda_builder/theme_settings.html$',views.theme_settings),
+    ('^cda_builder/reporting.html$',views.return_attribute_list),
+    ('^generate_csv.html/index.html$',views.index),
+    ('^generate_csv.html/$',views.generate_csv),
+    ('^generate_csv.html/all_clinics.html$',views.all_clinics),
+    ('^generate_csv.html/add_clinic.html$',views.add_clinic),
+    ################Patients######################
+    ('^generate_csv.html/patient_manager.html$',views.patient_manager),
+    ('^generate_csv.html/admin_settings.html$',views.admin_settings),
+    ('^generate_csv.html/theme_settings.html$',views.theme_settings),
+    ('^generate_csv.html/reporting.html$',views.return_attribute_list),     
     ('^cda_builder/fun.html$',views.fun),
     ('^cda_builder/non.html$',views.non),
     ('^cda_builder/patient_search.html$',views.patient_search),
@@ -43,18 +53,4 @@ urlpatterns = patterns('',
     # url(r'^admin/', include(admin.site.urls)),
 )
 
-"""
-Copyright 2011 Health Records for Everyone
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""

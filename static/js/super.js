@@ -3,128 +3,35 @@ $(function() {
 		var namespace_counter = 1;
 		var $tab_title_input = $( "#tab_title");
 		var $tag_title_input = $( "#tag_title");
+
+
+		var $header_tab_title_input = $( "#header_tab_title");
+		var $header_tag_title_input = $( "#header_tag_title");
+		var $body_tab_title_input = $( "#body_tab_title");
+		var $body_tag_title_input = $( "#body_tag_title");
+		var $doc_name_title_input = $("#doc_name_title");
 		var $clinic_name_title_input = $("#clinic_name_title");
 		//this list is needed for the header tag adder dialog
+		
 		//you will have to set this counter each time you come to this page.
-		//var widgets = new Array();
-		//widgets[0] = new Widget("Demo",new Array(),"Intake","Demographics");
-		//get the clinic settings tabs ready for group
-		$(".clinic_settings_tabs").tabs();
-
-		function Widget(the_name,fields,station,section)
-		{
-			this.the_name = the_name;
-			this.fields = fields;
-			this.station = station;
-			this.section = section;
-			//this method takes in the div where the html
-			//should be added.
-			this.create = function(diver, htmler) {
-     				diver.append(htmler);
-  			};
-		};
-
-		function Field(the_name,input_type,inherited,XMLBind,one_two_column)
-		{
-			this.the_name = the_name;
-			this.input_type = input_type;
-			this.inherited = inherited;
-			this.XMLBind = XMLBind;
-			this.one_two_column = one_two_column;
-		};
+		var tab_counter = 0;
+		var header_tab_counter = 0;
+		var body_tab_counter = 0;
+		var $header_tab_selection = $("#header_title_choice");
+		var $body_tab_selection = $("#body_title_choice");
 
 
 		
-		var widgets = new Array();
-		var fields = new Array();
-		var fnameField = new Field("First Name","text","None","{namespace}path/","one");
-		var lnameField = new Field("Last Name","text","None","{namespace}path/","one");
-		fields[0] = fnameField;
-		fields[1] = lnameField;
-		var nameWidget = new Widget("Name",fields,"Intake","Demographics");
-		var lnameWidget = new Widget("Last Name",lnameField,"Intake","Demographics");
-		widgets[0] = nameWidget;
-		widgets[1] = lnameWidget;		
-
-
-		/*<form>
-						<fieldset class="ui-helper-reset">
-							<label for="field_name">Field 1</label>
-							<input type="text" name="field_name" id="field_name" value="" class="ui-widget-content ui-corner-all" />
-						</fieldset>
-					</form>*/
-
-
-		
-		//this method is for preview a specific widget in the dialog box
-		document.getElementById("widget_title_choice").onchange = function(){
-		  	//alert($("#widget_title_choice option:selected").html());
-			//do a search into the widget list and then invoke the
-			//create method into the preview box
-			//do this we need to go through each field and the widget
-			//and append that field into the preview div...
-			//we need to use the .create method...
-			//this is a farking disaster...you need to change this to be more 
-			//generic
-			for(var i =0; i < widgets.length; i++)
-			{
-				if (widgets[i].the_name === $("#widget_title_choice option:selected").html())
-				{
-					$(".widget_preview").find(".widget_container").remove();
-					$(".widget_preview").append("<div class=\"widget_container\"><div class=\"r4 left\"></div></div>");
-					$(".widget_preview .r4 form").remove();
-					widgets[i].create($(".widget_preview .r4"),$("<form>").append("<fieldset></fieldset>"));
-					for (var j = 0; j < widgets[i].fields.length; j++)
-					{
-						var field_name = widgets[i].fields[j].the_name;
-						var label = "<label for =\"" + field_name + "\">" + field_name + "</label>";
-						var input = "<input type=\"" + widgets[i].fields[j].input_type + "\" name=\"" + field_name + "\" id=\"" + field_name + "\" value=\"\" class=\"ui-widget-content ui-corner-all\" />";
-						$(".widget_preview .r4 form fieldset").append(label);
-						$(".widget_preview .r4 form fieldset").append(input);
-					}
-					//widgets[i].create($(".widget_preview .r4"),$("<form>").append("<fieldset></fieldset>").append(label));
-				}
-			}
-		}
-
-		
-
-		//take all of the widgets and populate the widget_title_choice select
-		function populateWidgetDialogList()
-		{
-			$("#add_widget_dialog #widget_title_choice").find("option").remove();
-			for(var i =0; i < widgets.length; i++)
-			{
-				$("#add_widget_dialog #widget_title_choice").append("<option value= \"" + widgets[i].the_name + "\">"+ widgets[i].the_name +"</option>");
-			}
-		}
 		
 		
-
-		//we have to use this initialize the exit station
-		//and the intake stations
-		$( "#stations" )
-			.accordion({
-				collapsible: true,
-				header: "> div > h3"
-			})
-			.sortable({
-				axis: "y",
-				handle: "h3",
-				stop: function( event, ui ) {
-					// IE doesn't register the blur when sorting
-					// so trigger focusout handlers to remove .ui-state-focus
-					ui.item.children( "h3" ).triggerHandler( "focusout" );
-				}
-		});
+		
+		//$("#station_title").val(),"station");
 		
 		//we want this function to return true | false
 		//dependent on whether or not the validation passes
 		//we take in the type of validation we should do
 		//called save_name = { "doc_save" || "section_save" || "tag_save" }
-		//we need to validate the selected options...
-		//we need to allow spaces...
-		function isValid(text,part,pertinent_station)
+		function isValidSection(text,part)
 		{
 			//characters must be alpha and have a min of two characters.
 			var re = /^[A-Z]{2,}$/i;
@@ -134,29 +41,54 @@ $(function() {
 			if(!(re.test(text)))
 			{
 				errors.push("Hey, you need to use a minimum of two alpha characters.");
-				errors.push("Just a friendly reminder: No special characters or spaces.");
+				errors.push("Just a friendly reminder: No special characters (including spaces)");
 			}
 			if(part === "station")
 			{
 				
 				if(isSame(text,$(".group h3 a")))
 				{
-					errors.push("Your station title needs to be unique.");
+					errors.push("You station title needs to be unique");
 				}
 			}
-			//you need to add in validation for the section
-			if(part === "section")
+			if(part === "tab")
 			{
-				//text will be the station name...you need to do a crawl of some html
-				//I need to get the station name...from h3 > a
-				if(isSame(text,$("#station_" + pertinent_station).find("li > a")))
+				if(isSame(text,$("#header_tabs ul li a")) || isSame(text,$("#body_tabs ul li a")))
 				{
-					errors.push("Your section name needs to be unique per station.");
+					errors.push("Your section title needs to be unique");
 				}
-				if(text === "")
-				{
-					errors.push("You need to have a station...");
-				}
+			}
+			//you might want to turn this validation part off.
+			//what if you have <text> and <text> under different parents...
+			//that would be berry bad...
+			if(part === "tag")
+			{
+				$("#header_tabs ul li a").each(function() {
+					var possible_matches = collectTags($(this).text());
+					for(var i in possible_matches)
+					{
+						if(text === possible_matches[i]['name'])
+						{
+							errors.push("Your tag title needs to be unique...thanks");
+						}
+						
+					}
+	
+					
+				});
+				$("#body_tabs ul li a").each(function() {
+					var possible_matches = collectTags($(this).text());
+					for(var i in possible_matches)
+					{
+						if(text === possible_matches[i]['name'])
+						{
+							errors.push("Your tag title needs to be unique...thanks");
+						}
+						
+					}
+	
+					
+				});
 			}
 			return errors;
 		}
@@ -201,7 +133,152 @@ $(function() {
 					}
 			}
 		}
-		
+		//should I put up a close button that removes the div?
+		/*
+		*
+		*	DIALOG BOXES
+		*
+		*/
+		// modal dialog init: custom buttons and a "close" callback reseting the form inside
+		//eventually, you should create a function handler that manages 
+		//dialog box creation...this seems a little excessive.
+		//there are many simplifications that can be made here...
+		var $header_section_dialog = $( "#add_header_section_dialog" ).dialog({
+			autoOpen: false,
+			modal: true,
+			height:400,
+			buttons: {
+				Add: function() {
+					var errors_list = isValidSection($header_tab_title_input.val(),"tab");
+					//if we have errors, send errors_list into addErrors(...)
+					if(errors_list.length > 0)
+					{
+						addErrors($(this),errors_list);
+					}
+					else
+					{
+						addTab("header");
+						$( this ).dialog( "close" );
+					}
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			},
+			open: function() {
+				$header_tab_title_input.focus();
+			},
+			close: function() {
+				$(".errors").remove().fadeOut();
+				$header_section_form[ 0 ].reset();
+			}
+		});
+
+		var $header_tag_dialog = $( "#add_header_tag_dialog" ).dialog({
+			autoOpen: false,
+			modal: true,
+			width: 500,
+			height: 500,
+			buttons: {
+				Add: function() {
+					var errors_list = isValidSection($header_tag_title_input.val(),"tag");
+					//if we have errors, send errors_list into addErrors(...)
+					if(errors_list.length > 0)
+					{
+						addErrors($(this),errors_list);
+					}
+					//otherwise we add our tab to the header section
+					//and close ze box.
+					else
+					{
+						addTag("header",cleanAttributes($(".header_attributes :input")));
+						$( this ).dialog( "close" );
+					}
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			},
+			open: function() {
+				$header_tag_title_input.focus();
+			},
+			close: function() {
+				$(".errors").remove();
+				$(this).reset();
+			}
+		});
+
+		// modal dialog init: custom buttons and a "close" callback reseting the form inside
+		var $body_section_dialog = $( "#add_body_section_dialog" ).dialog({
+			autoOpen: false,
+			modal: true,
+			height:400,
+			buttons: {
+				Add: function() {
+					var errors_list = isValidSection($body_tab_title_input.val(),"tab");
+					//if we have errors, send errors_list into addErrors(...)
+					if(errors_list.length > 0)
+					{
+						addErrors($(this),errors_list);
+					}
+					//otherwise we add our tab to the header section
+					//and close ze box.
+					else
+					{
+						addTab("body");
+						$( this ).dialog( "close" );
+					}
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			},
+			open: function() {
+				$body_tab_title_input.focus();
+			},
+			close: function() {
+				$(".errors").remove();
+				$body_section_form[ 0 ].reset();
+			}
+		});
+
+
+		//addTag needs to send in {"header || "body"}
+		var $body_tag_dialog = $( "#add_body_tag_dialog" ).dialog({
+			autoOpen: false,
+			modal: true,
+			width: 500,
+			height: 500,
+			buttons: {
+				Add: function() {
+					var errors_list = isValidSection($body_tag_title_input.val(),"tag");
+					//if we have errors, send errors_list into addErrors(...)
+					if(errors_list.length > 0)
+					{
+						addErrors($(this),errors_list);
+					}
+					//otherwise we add our tab to the header section
+					//and close ze box.
+					else
+					{
+						//collect all of the attributes and send em in...
+						//to be added to the tag div as a ul
+						addTag("body",cleanAttributes($(".body_attributes :input")));
+						$( this ).dialog( "close" );
+					}
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			},
+			open: function() {
+				$body_tag_title_input.focus();
+			},
+			close: function() {
+				$(".errors").remove();
+				$body_tag_form[ 0 ].reset();
+			}
+		});
 
 
 		//Clean up any attributes (This is old).
@@ -235,7 +312,149 @@ $(function() {
 		}
 
 
+		/*
+		*	LA FIN DU DIALOGE
+		*
+		*/
+
 		
+
+		// addTab form: calls addTab function on submit and closes the dialog
+		var $header_section_form = $( "form", $header_section_dialog ).submit(function() {
+			addTab("header");
+			$header_section_dialog.dialog( "close" );
+			return false;
+		});
+
+		// addTab form: calls addTab function on submit and closes the dialog
+		var $header_tag_form = $( "form", $header_tag_dialog ).submit(function() {
+			addTag("header");
+			$header_section_dialog.dialog( "close" );
+			return false;
+		});
+
+
+		// addTab form: calls addTab function on submit and closes the dialog
+		var $body_section_form = $( "form", $body_section_dialog ).submit(function() {
+			addTab("body");
+			$body_section_dialog.dialog( "close" );
+			return false;
+		});
+
+		// addTab form: calls addTab function on submit and closes the dialog
+		var $body_tag_form = $( "form", $body_tag_dialog ).submit(function() {
+			addTag("body");
+			$body_section_dialog.dialog( "close" );
+			return false;
+		});
+
+		/*
+		*	LES CONTROLLERS DES TABS
+		*
+		*/
+
+
+		$( "#sections span.ui-icon-close" ).live( "click", function() {
+			var index = $( "li", $section_tabs ).index( $( this ).parent() );
+			var tab_name = $( "li a", $section_tabs ).text();
+			$section_tabs.tabs( "remove", index );
+		});
+
+		var $header_tabs = $( "#header_tabs").tabs({
+			tabTemplate: "<li><a href='#{href}'>#{label}</a> <span class='ui-icon ui-icon-close'>Remove Tab</span></li>",
+			add: function( event, ui ) {
+				//we need to reconnect the sortable.
+				var x = $('<ol></ol>').attr('class', 'sortable');
+				$( ui.panel ).append( x );
+				$(x).nestedSortable({connectWith:'.sortable'});
+			}
+		});
+
+		var $body_tabs = $( "#body_tabs").tabs({
+			tabTemplate: "<li><a href='#{href}'>#{label}</a> <span class='ui-icon ui-icon-close'>Remove Tab</span></li>",
+			add: function( event, ui ) {
+				//we need to reconnect the sortable.
+				var x = $('<ol></ol>').attr('class', 'sortable');
+				$( ui.panel ).append( x );
+				//connect the nested Sortable with ZE JQUERY.
+				$(x).nestedSortable({connectWith:'.sortable'});
+				//nestedSortable(connectWith:'ol.sortable');
+			}
+		});
+
+		/*
+		*	LES CONTROLLERS DES TABS
+		*
+		*/
+
+		//takes in the part (header or body)
+		//and add a tab. 
+		//you need to address these counters...
+		//are they necessary?
+		function addTab(part) {
+				var tab_title = $header_tab_title_input.val() || $body_tab_title_input.val() || "Tab " + tab_counter;				
+				if (part == 'header')
+				{
+					$header_tabs.tabs( "add", "#tabs-"+ tab_title, tab_title );
+					header_tab_counter++;
+					
+				}
+				else
+				{
+					$body_tabs.tabs( "add", "#tabs-"+ tab_title, tab_title );
+					body_tab_counter++;
+				}
+				$("#add_" + part + "_tag_dialog select").append("<option value= \"" + tab_title + "\">"+ tab_title +"</option>");
+			
+		}
+
+		//function removeTabOption(part,tab_name)
+		function removeTabOption(part,tab_name)
+		{
+			$("#" + part + "_title_choice option[value=\"" + tab_name +"\"]").remove();
+		}
+
+
+		
+		
+		//this is saying to use .children()
+		//example (#part).find(
+		function addTag(part,attributes) {
+			var adder = "<ul class = \"attributes\">";
+			for (var i in attributes)
+			{
+				adder = adder + "<li>"+ attributes[i] +"</li>";
+			}
+			adder = adder + "</ul>";
+			//go through the attribute list node and
+			//collect all of the inputs...
+			//make sure to clear the form each time a close occurs.
+			var tag_title = $header_tag_title_input.val() || $body_tag_title_input.val() || "Tag " + tag_counter;
+			var x ="<li id= \"list\">"+
+				"<div class=\"the_sortables\">"+
+				"<h1 class =\"tag_title\">" + tag_title + "</h1>"
+				 + adder + "<div class=\"button_holder\">"+
+				"<div class='ui-icon ui-icon-close'>Delete</div>"+
+				"<div class='ui-icon ui-icon-pencil'>Edit</div>"+
+				"</div>"+
+				"</div>"+
+				"</li>";
+			$("#"+ part +"_tabs #tabs-"+ $("#" + part + "_title_choice").val() +" ol.sortable").append(x);
+			
+		}
+		
+		
+
+
+		$( "#add_body_attribute" )
+			.button({ icons: { primary: "ui-icon-plusthick" }})
+			.click(function() {
+				$("#add_body_tag_dialog fieldset ul").append("<li>" +
+					"<input type=\"text\" name=\"tab_attribute_name\" id=\"tab_attribute_name\""+
+					" value=\"\" class=\"ui-widget-content ui-corner-all\" /\>"+
+					"<span class='ui-icon ui-icon-close'>Remove Attribute</span>"+
+				"</li>");
+			});
 
 		
 		$( "#add_namespace" )
@@ -292,6 +511,28 @@ $(function() {
 			return tags;
 		}
 
+		//#list with h1:tag_title of tag_title...
+		//find it...and then find its parent of parent (ol > #list)
+		//if it exists...mark the parents.
+		//if not, mark it as root.
+		//send in an ol in #tabs-texter...check to see if it has
+		//a parent of parent of #list...if it does...store parent of #list h1.tag_title as the parent.
+		//return the parent name.
+		function getParent(tag)
+		{
+			var parent_name = tag.parent('div.the_sortables').parent('li#list').parent('ol').parent('li#list');
+			//this means that we have a parent...
+			//and return the parent's name (tag_name of sort).
+			if (parent_name.length > 0)
+			{
+				return parent_name.children('div.the_sortables').children(' h1.tag_title').text();
+			}
+			//return the root node...
+			else
+			{
+				return "root";
+			}
+		}
 
 		//collect the values from the namespaces input
 		function collectNamespaces()
@@ -313,7 +554,7 @@ $(function() {
 			.button({ icons: { primary: "ui-icon-disk" }})
 			.click(function() {
 				var doc_name_input = $doc_name_title_input.val();
-				if(!(isValid(doc_name_input)))
+				if(!(isValidSection(doc_name_input)))
 				{
 					addErrors($("#options"),["Hey! You forgot the document name."]);
 				}
@@ -418,15 +659,80 @@ $(function() {
 		});
 
 
+		function log( message ) {
+			$( "<div/\>" ).text( message ).prependTo( "#patient_results" );
+			$( "#log" ).scrollTop( 0 );
+		}
+
+		//Yup this is my list of searchable patients for JQuery.
+		//The team running the patient search will need to remedy this...
+		//Sorry everyone!
+		var availableTags = [
+			"Alex Gainer",
+			"Phil Strong",
+			"Mary Roth",
+			"James Davis",
+			"Anthony Masuda",
+			"Bob Bobbers",
+			"Ryan Ryaners",
+			"Paul Paulers",
+			"George Georgers",
+			"Eric Ericson"
+		];
+
+		//Basic autocomplete functionality...
+		//the data source is the array above.
+		$( ".demo #patients" ).autocomplete({
+			source: availableTags,
+			minLength: 2,
+			select: function( event, ui ) {
+				log( ui.item ?
+					"Selected: " + ui.item.value :
+					"Nothing selected, input was " + this.value );
+			}
+		});
+		
+
+		// close icon: removing the tab on click
+		// note: closable tabs gonna be an option in the future - see http://dev.jqueryui.com/ticket/3924
+		//you have to remove the tab from the body list options...
+		$( "#body_tabs span.ui-icon-close" ).live( "click", function() {
+			var index = $( "li", $body_tabs ).index( $( this ).parent() );
+			var tab_name = $( "li a", $body_tabs ).text();
+			$body_tabs.tabs( "remove", index );
+			removeTabOption("body",tab_name);
+		});
+
+		
+		// close icon: removing the tab on click
+		// note: closable tabs gonna be an option in the future - see http://dev.jqueryui.com/ticket/3924
+		//aha this is the culprit...this is being called in junction with the other...maybe make it a div.
+		$( "#header_tabs span.ui-icon-close" ).live( "click", function() {
+			var index = $( "li", $header_tabs ).index( $( this ).parent() );
+			var tab_name = $( "li a", $header_tabs ).text();
+			$header_tabs.tabs( "remove", index );
+			removeTabOption("header",tab_name);
+		});
+	
 		
 		
+
+
+
+		
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		$("#station").sortable({
+			revert:true
+		});
+
 		
 		$( ".sortable_widgets" ).sortable();
 		$( ".sortable_widgets" ).disableSelection();
 
-		/*
-			DRAGGABLE CODE, but Probably going to delete this.
-		*/
+		//it appears as if we need a generic sortable
 
 		$(".dragger").draggable();		
 	
@@ -435,6 +741,7 @@ $(function() {
 			helper: "clone",
 			revert: "invalid"
 		});
+
 
 		$("ul, li").disableSelection();
 		//okay, in this instance.
@@ -449,30 +756,33 @@ $(function() {
 						.html( "Dropped!" );
 			}
 		});
-		/*
-			END DRAGGABLE CODE, but Probably going to delete this.
-		*/
-
 		
-		/*********************************************************
-			ADD STATION CODE:
-			DIALOG BOX,
-			BUTTON,
-			Function to add station.
+		//This is for adding new sections to each station...
+		$( "#add_section_button" )
+			.button({ icons: { primary: "ui-icon-plusthick" }})
+			.click(function() {
+				$add_section_dialog.dialog( "open" );
+		});
 
-		*********************************************************/
-		//This method adds a station to the "#stations" div
-		//we take in the station title and add the entire setup 
-		//for an accordion and connect the accordion as a sortable
+		//lets work on adding a station
+		// addTab button: just opens the dialog
+		$( "#add_station_button" )
+			.button({ icons: { primary: "ui-icon-circle-plus" }})
+			.click(function() {
+				$add_station_dialog.dialog( "open" );
+		});
+
+
+		//when we add a station...we need to connect the panel to the sortable
 		function addStation(title) {
-				var x = "<div class=\"group\" id =\"station_"+ title +"\" title =\"station_"+ title +"\"><h3><a href= \"#\">"+ title +
-					"</a><span class='ui-icon ui-icon-close'>Remove Station</span></h3><div id=\"sections\"><ul><\/ul></div></div>";
-				//Okay, this add the station to the stations ID in add_clinic.html and edit_clinic.html
-				$("#add_section_dialog #station_title_choice").append("<option value= \"" + title + "\">"+ title +"</option>");
-				$("#add_widget_dialog #station_title_choice").append("<option value= \"" + title + "\">"+ title +"</option>");
-				//This connect the new group to an accordion and makes it sortable.
-				$("#station_"+ title + " #sections" ).tabs();
-				$("#stations").append(x).accordion('destroy')
+				//add in the title to well...create station and then...
+				//add in the title //add the #station
+				var x = "<div class=\"group\" title =\"station_"+ title +"\"><h3><a href= \"#\">"+ title +"</a></h3><div><p>You need to add some sections!<\/p></div></div>";
+				//var $title_name = $('<h3>').append($('<a>').attr('href','#').html(title));
+				//var $content = $('<div>').append($('<p>').html("Hello"));
+				//add the station name to the section add dialog box
+				$("#add_section_dialog select").append("<option value= \"" + title + "\">"+ title +"</option>");
+				$("#station").append(x).accordion('destroy')
 					.accordion({
 						collapsible: true,
 						header: "> div > h3"
@@ -488,62 +798,13 @@ $(function() {
 						}
 				});
 		}
-
-		//we need to somehow add some functionality to delete a station...
-		//sweet this removes a station
-		$( ".group h3 span.ui-icon-close" ).live( "click", function() {
-			$(this).parent().parent().remove();
-			//we also need to remove this title from the select option thingy in the add_station_dialog box
-			//this will pass in the name of the station to a function to remove that specific option
-			//from a select box in the section dialog box.
-			removeOption("station",$(this).parent().parent().find('a').text());
-			
-		});
-
-		//This can remove generic options from the dialog boxes...
-		//mainly used for removing stations and sections from the dialog
-		//select option.
-		function removeOption(option_type,option_name)
-		{
-			$("#"+ option_type +"_title_choice option[value=\"" + option_name +"\"]").remove();
-		}
-
-
-		//This is to disable the enter key from submitting the form
-		//to the server...this would be bad...
-		//button eq 0 is the enter button
-		$("#add_station_dialog").keypress(function (event) {
-			if (event.keyCode == 13) {
-				event.preventDefault();
-				$(this).parent()
-				   .find("button:eq(0)").trigger("click");
-			}
-		});
-
-		//This is to disable the enter key from submitting the form
-		//to the server...this would be bad...
-		//button eq 0 is the enter button
-		$("#add_section_dialog").keypress(function (event) {
-			if (event.keyCode == 13) {
-				event.preventDefault();
-				$(this).parent()
-				   .find("button:eq(0)").trigger("click");
-			}
-		});
-
-
-		//This is to disable the enter key from submitting the form
-		//to the server...this would be bad...
-		//button eq 0 is the enter button
-		$("#add_widget_dialog").keypress(function (event) {
-			if (event.keyCode == 13) {
-				event.preventDefault();
-				$(this).parent()
-				   .find("button:eq(0)").trigger("click");
-			}
-		});
-
 		
+
+		/*
+		*
+		*	DIALOG BOXES
+		*
+		*/
 		// modal dialog init: custom buttons and a "close" callback reseting the form inside
 		//eventually, you should create a function handler that manages 
 		//dialog box creation...this seems a little excessive.
@@ -552,11 +813,9 @@ $(function() {
 			autoOpen: false,
 			modal: true,
 			height:400,
-			width:600,
 			buttons: {
 				Add: function() {
-					//do some basic validation
-					var errors_list = isValid($("#station_title").val(),"station");
+					var errors_list = isValidSection($("#station_title").val(),"station");
 					//if we have errors, send errors_list into addErrors(...)
 					if(errors_list.length > 0)
 					{
@@ -582,23 +841,13 @@ $(function() {
 			}
 		});
 
-		/*********************************************************
-			ADD Section CODE:
-			DIALOG BOX,
-			BUTTON,
-			Function to add section.
-
-		*********************************************************/
-		
-		//This is for adding new sections to each station...
 		var $add_section_dialog = $( "#add_section_dialog" ).dialog({
 			autoOpen: false,
 			modal: true,
 			height:400,
-			width:600,
 			buttons: {
 				Add: function() {
-					var errors_list = isValid($("#section_title").val(),"section",$("#station_title_choice option:selected").val());
+					var errors_list = isValidSection($("#section_title").val(),"section");
 					//if we have errors, send errors_list into addErrors(...)
 					if(errors_list.length > 0)
 					{
@@ -606,7 +855,8 @@ $(function() {
 					}
 					else
 					{
-						addSection($("#section_title").val(),$("#station_title_choice option:selected").val());
+						
+						addSection($("#section_title").val());
 						$( this ).dialog( "close" );
 					}
 				},
@@ -624,37 +874,41 @@ $(function() {
 		});
 
 
-		//Okay,
-		//this method add a section to the corresponding station
-		//we pass in the name of the section as "part"
-		//and the station_name
-		//then we create tabs out of the new section "part"
-		//and connect the tabs as sortable items.
-		function addSection(part,station_name)
+		var $section_tabs = $( "#sections").tabs({
+			tabTemplate: "<li><a href='#{href}'>#{label}</a> <span class='ui-icon ui-icon-close'>Remove Tab</span></li>",
+			add: function( event, ui ) {
+				//we need to reconnect the sortable.
+				var x = $('<div></div>').attr('class', 'sortable_widgets');
+				$( ui.panel ).append( x );
+				$(x).sortable({connectWith:'.sortable_widgets'});
+			}
+		});
+	
+		//add into the correct station...
+		//when you add into the correct station, you need to connect to sortable_widgets...
+		function addSection(section_title,part)
 		{
-			$("#add_section_dialog #section_title_choice").append("<option value= \"" + part + "\">"+ part +"</option>");
-			$("#add_widget_dialog #section_title_choice").append("<option value= \"" + part + "\">"+ part +"</option>");
-			var $section_tabs = $( "#station_" + station_name +" #sections").tabs({
-				tabTemplate:"<li><a href='#{href}'>#{label}</a> <span class='ui-icon ui-icon-close'>Remove Tab</span></li>",
-				add: function( event, ui ) {
-					//$( ui.panel ).append( "<div>" + "Add some widgets..." + "</div>" );
-					var x = $('<div>Boo</div>').attr('class', 'sortable_widgets');
-					$( ui.panel ).append( x );
-					$(x).sortable({connectWith:'.sortable_widgets'});
-				}
-			});
-			$section_tabs.tabs("add","#tabs-"+ part, part);
-			$( "#station_" + station_name +" #sections" ).tabs().find( ".ui-tabs-nav" ).sortable({ axis: "x" });
+			$section_tabs.tabs("add","#station-"+ part, section_title);
+			
 		}
 
-		/*********************************************************
-			END END END			
-			ADD Section CODE:
-			DIALOG BOX,
-			BUTTON,
-			Function to add section.
+		function addTab(part) {
+				var tab_title = $header_tab_title_input.val() || $body_tab_title_input.val() || "Tab " + tab_counter;				
+				if (part == 'header')
+				{
+					$section_tabs.tabs( "add", "#tabs-"+ tab_title, tab_title );
+					header_tab_counter++;
+					
+				}
+				else
+				{
+					$body_tabs.tabs( "add", "#tabs-"+ tab_title, tab_title );
+					body_tab_counter++;
+				}
+				$("#add_" + part + "_tag_dialog select").append("<option value= \"" + tab_title + "\">"+ tab_title +"</option>");
+			
+		}
 
-		*********************************************************/
 		//when you add the widget in...have the sortable be present...
 		//but wrap it into a droppable...
 		//maybe have a droppable and then when you put the widget it...
@@ -669,83 +923,46 @@ $(function() {
 			$(this).parent().remove();
 		});
 
+		// actual addTab function: adds new tab using the title input from the form above
+		function addStationSection() {
+			var tab_title = $tab_title_input.val();
+			$tabs.tabs( "add", "#tabs-" + tab_counter, tab_title );
+			tab_counter++;
+		}
 
-		//somehow I need to get the name of the station from the #station_Name div
-		//and then pass it into the tabs.tabs(remove) method to remove that tab...
-		//you will also need to remove that section from the overall tab list.
-		$( "#sections span.ui-icon-close" ).live( "click", function() {
-			var station_name = "#" + $(this).parent().parent().parent().parent().attr('id');
-			var index = $( "li", $(station_name) ).index( $( this ).parent() );
-			$( station_name + " #sections").tabs( "remove", index );
-			//remove from all option lists:
-			removeOption("section",$(this).parent().find('a').text());
-		});
-
-
-
-		//This is for adding new sections to each station...
-		var $add_widget_dialog = $( "#add_widget_dialog" ).dialog({
-			autoOpen: false,
-			modal: true,
-			height:800,
-			width:800,
-			buttons: {
-				Add: function() {
-					/*var errors_list = isValidSection($("#section_title").val(),"section");
-					//if we have errors, send errors_list into addErrors(...)
-					if(errors_list.length > 0)
-					{
-						addErrors($(this),errors_list);
-					}
-					else
-					{
-						addSection($("#section_title").val(),$("#station_title_choice option:selected").val());
-						$( this ).dialog( "close" );
-					}*/
-					$( this ).dialog( "close" );
-				},
-				Cancel: function() {
-					$( this ).dialog( "close" );
-				}
-			},
-			open: function() {
-				$("#widget_title").focus();
-			},
-			close: function() {
-				//$(".errors").remove().fadeOut();
-				//$("#section_title").val("");
-			}
-		});
-
-
-
-		/*
-			ALL OF OUR BUTTON CODE
-		*/
-
-		//lets work on adding a station
 		// addTab button: just opens the dialog
-		$( "#add_station_button" )
-			.button({ icons: { primary: "ui-icon-circle-plus" }})
+		$( "#add_tab" )
+			.button()
 			.click(function() {
-				$add_station_dialog.dialog( "open" );
+				$dialog.dialog( "open" );
+			});
+
+		// close icon: removing the tab on click
+		// note: closable tabs gonna be an option in the future - see http://dev.jqueryui.com/ticket/3924
+		$( "#sections span.ui-icon-close" ).live( "click", function() {
+			alert("Hey");
+			var index = $( "li", $tabs ).index( $( this ).parent() );
+			$tabs.tabs( "remove", index );
 		});
 
 
-		$( "#add_section_button" )
-			.button({ icons: { primary: "ui-icon-plusthick" }})
-			.click(function() {
-				$add_section_dialog.dialog( "open" );
+
+		$( "#station" )
+			.accordion({
+				collapsible: true,
+				header: "> div > h3"
+			})
+			.sortable({
+				axis: "y",
+				handle: "h3",
+				stop: function( event, ui ) {
+					// IE doesn't register the blur when sorting
+					// so trigger focusout handlers to remove .ui-state-focus
+					ui.item.children( "h3" ).triggerHandler( "focusout" );
+				}
 		});
 
 
-		$( "#add_widget_button" )
-			.button({ icons: { primary: "ui-icon-gear" }})
-			.click(function() {
-				populateWidgetDialogList(widgets);
-				$add_widget_dialog.dialog( "open" );
-		});
-		
 		
 
 		$( "#clinic_save_button" )
@@ -755,6 +972,8 @@ $(function() {
 		});
 
 		
+		
+
 		
 		$( "#clinic_load_button" )
 			.button({ icons: { primary: "ui-icon-refresh" }})
@@ -768,6 +987,7 @@ $(function() {
 				});
 		});
 
+		$( "#sections" ).tabs();
 		
 		$( "#minimize_widgets" )
 			.button({ icons: { primary: "ui-icon-carat-2-n-s" }})
@@ -789,16 +1009,6 @@ $(function() {
 			}
 		});
 
-		/*
-			END END END ALL OF OUR BUTTON CODE
-		*/
-
-		
-
-		/*
-			THIS IS CODE TO MAKE A SCROLLBAR THAT CAN BE RESIZED
-		*/
-
 		//scrollpane parts
 		var scrollPane = $( ".scroll-pane" ),
 			scrollContent = $( ".scroll-content" );
@@ -814,8 +1024,8 @@ $(function() {
 					scrollContent.css( "margin-left", 0 );
 				}
 			}
-		});		
-
+		});
+		
 		//append icon to handle
 		var handleHelper = scrollbar.find( ".ui-slider-handle" )
 		.mousedown(function() {
@@ -870,9 +1080,7 @@ $(function() {
 		setTimeout( sizeScrollbar, 10 );//safari wants a timeout
 
 
-		/*
-			END SCROLLBAR CODE
-		*/
+
 
 
 
@@ -880,23 +1088,7 @@ $(function() {
 	});
 
 
-/*
-"""
-Copyright 2011 Health Records for Everyone
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
-*/
 
 
 	

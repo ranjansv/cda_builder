@@ -15,30 +15,6 @@ div#documents-contain table td, div#documents-contain table th { border: 1px sol
 End add_cda styles
 */
 
-
-.r1,.r2,.r3,.r4,.r5,.r6,.r7,.r8,.r9,.r10,.r11,.r12,.r13,.r14{margin: 24px 12px; float: left;}
-.r1  {width: 48px;}
-.r2  {width: 120px;}
-.r3  {width: 192px;}
-.r4  {width: 264px;}
-.r5  {width: 336px;}
-.r6  {width: 408px;}
-.r7  {width: 480px;}
-.r8  {width: 552px;}
-.r9  {width: 624px;}
-.r10 {width: 696px;}
-.r11 {width: 768px;}
-.r12 {width: 840px;}
-.r13 {width: 912px;}
-.r14 {width: 984px;}
-.left{margin-left: 24px;}
-
-.widget_preview h3
-{
-	border:1px;
-}
-
-
 ul ul, ol ul {
 	list-style-type: none;
 }

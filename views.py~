@@ -16,8 +16,13 @@ import subprocess
 import argparse
 import random
 import shutil
+import reporting
 
+def return_attribute_list(request):
+    return reporting.return_attribute_list(request)
 
+def generate_csv(request):
+    return reporting.generate_csv(request)
 #cda class creation is invoked via add_cda.
 #The user should select his or her attributes...
 #I need to come up with a solution to the namespace dict...
